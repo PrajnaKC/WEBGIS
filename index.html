@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🗺️ Village Land Plots - Google Maps API</title>
+    <!-- Leaflet CSS -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""
+    />
+    <!-- Your custom CSS -->
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <h2>🗺️ Village Land Plots - Google Maps API</h2>
+    <div id="status-panel" aria-live="polite">
+        <div class="status-row"><strong>Mode:</strong> <span id="status-mode">Initializing…</span></div>
+        <div class="status-row"><strong>Features:</strong> <span id="status-features">0</span></div>
+        <div class="status-row"><strong>Fallback:</strong> <span id="status-fallback">No</span></div>
+        <div class="status-row small" id="status-message">Loading…</div>
+    </div>
+    <div id="map">
+        <div style="text-align: center; padding: 50px; color: #666;">
+            Loading Google Maps...
+        </div>
+    </div>
+
+    <!-- Leaflet JavaScript (for hybrid support) -->
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""
+        defer
+    ></script>
+        <!-- App logic (defines initGoogleMap) -->
+        <script src="script.js" defer></script>
+        <!-- Diagnostic probe: check exposure timing -->
+        <script>
+            window.__gmProbeTime = Date.now();
+            document.addEventListener('DOMContentLoaded', () => {
+                console.log('[DIAG] DOMContentLoaded. window.initGoogleMap =', typeof window.initGoogleMap);
+            });
+            setTimeout(() => {
+                console.log('[DIAG] +1500ms after insertion. window.initGoogleMap =', typeof window.initGoogleMap);
+            }, 1500);
+        </script>
+    <!-- Google Maps API (defer only for stable callback) -->
+    <script defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAMAp2xDXp96cr5wwheJfHcueAB2y3v4Ao&libraries=geometry,places&callback=initGoogleMap&loading=async">
+    </script>
+    
+    <script>
+        // Fallback error handling
+        window.addEventListener('error', function(e) {
+            console.error('JavaScript error:', e.error);
+            const mapDiv = document.getElementById('map');
+            if (mapDiv && !mapDiv.querySelector('.leaflet-container')) {
+                mapDiv.innerHTML = '<p style="text-align: center; padding: 50px; color: red;">Error loading map. Please check console for details.</p>';
+            }
+        });
+
+                // Recovery: if initGoogleMap not defined after a short delay, re-inject script.js
+                setTimeout(() => {
+                    if (typeof window.initGoogleMap === 'undefined') {
+                        console.warn('[RECOVERY] initGoogleMap still undefined; reinjecting script.js');
+                        const s = document.createElement('script');
+                        s.src = 'script.js?_reload=' + Date.now();
+                        s.onload = () => console.log('[RECOVERY] Reinjected script.js, now initGoogleMap =', typeof window.initGoogleMap);
+                        s.onerror = () => console.error('[RECOVERY] Failed to reinject script.js');
+                        document.head.appendChild(s);
+                    } else {
+                        console.log('[RECOVERY] initGoogleMap present, no reinjection needed.');
+                    }
+                }, 1200);
+    </script>
+</body>
+</html>

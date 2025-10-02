@@ -1,0 +1,95 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+}
+
+h2 {
+    text-align: center;
+    margin: 10px;
+}
+
+#map {
+    width: 100%;
+    height: 90vh; /* 90% of the viewport height */
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+/* Status Panel */
+#status-panel {
+        max-width: 340px;
+        margin: 0 auto 8px auto;
+        background: #ffffff;
+        border: 1px solid #dcdcdc;
+        border-radius: 8px;
+        padding: 10px 14px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        font-size: 14px;
+        line-height: 1.3;
+}
+#status-panel .status-row { margin: 4px 0; display: flex; gap: 6px; align-items: baseline; }
+#status-panel .status-row.small { font-size: 12px; color: #444; }
+#status-panel strong { color: #222; font-weight: 600; }
+#status-panel.success { border-color: #2e7d32; }
+#status-panel.error { border-color: #c62828; }
+#status-panel.warn { border-color: #ed6c02; }
+
+@media (max-width: 600px) {
+    #status-panel { font-size: 13px; padding: 8px 10px; }
+    #status-panel .status-row.small { font-size: 11px; }
+}
+
+/* Custom styling for map controls */
+.leaflet-control-layers {
+    font-size: 14px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    border-radius: 5px;
+    padding: 8px;
+}
+
+.leaflet-control-layers-expanded {
+    background: rgba(255, 255, 255, 0.98);
+}
+
+.leaflet-control-layers label {
+    margin: 4px 0;
+    font-weight: normal;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.leaflet-control-layers input[type="radio"] {
+    margin-right: 8px;
+}
+
+.leaflet-control-scale-line {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid #999;
+}
+
+/* Popup styling */
+.leaflet-popup-content {
+    margin: 8px 12px;
+    line-height: 1.4;
+}
+
+.leaflet-popup-content h4 {
+    margin: 0 0 8px 0;
+    color: #2c3e50;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    #map {
+        height: 85vh;
+    }
+    
+    h2 {
+        font-size: 1.2em;
+        margin: 5px;
+    }
+}
