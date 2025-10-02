@@ -49,7 +49,52 @@
         </script>
     <!-- Google Maps API (defer only for stable callback) -->
     <script defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAMAp2xDXp96cr5wwheJfHcueAB2y3v4Ao&libraries=geometry,places&callback=initGoogleMap&loading=async">
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDciPsvdxOy-OnesSpduDg_g-mojbC-NGI&libraries=geometry,places&callback=initGoogleMap&loading=async">
+    </script>
+    <!-- Manual safety initializer: if callback not invoked, try to start map explicitly -->
+    <script>
+        (function(){
+            const startTime = Date.now();
+            let attempts = 0;
+            function tryManualInit(){
+                if (window.google && google.maps){
+                    if (typeof window.initGoogleMap === 'function') {
+                        if (!window.__MANUAL_GMAP_INIT_DONE) {
+                            console.warn('[GMAP] Manual init attempt #' + (attempts+1));
+                            try { window.initGoogleMap(); window.__MANUAL_GMAP_INIT_DONE = true; } catch(e){ console.error('[GMAP] Manual init failed:', e); }
+                        }
+                        return; // success or already attempted
+                    } else {
+                        console.warn('[GMAP] google.maps present but initGoogleMap not defined yet.');
+                    }
+                } else if (attempts === 0) {
+                    console.log('[GMAP] Waiting for google.maps to become available...');
+                }
+                if (++attempts < 20) { // ~3s (20 * 150ms)
+                    setTimeout(tryManualInit, 150);
+                } else {
+                    const msgEl = document.getElementById('status-message');
+                    if (msgEl) msgEl.textContent = 'Google Maps failed. Switching to Leaflet fallback.';
+                    console.error('[GMAP] Gave up after ' + (Date.now()-startTime) + 'ms. Initiating Leaflet fallback.');
+                    // Try to invoke Leaflet fallback if app code loaded
+                    try {
+                        if (typeof window.initLeafletFallback === 'function') {
+                            window.initLeafletFallback();
+                        } else if (typeof window.switchToLeaflet === 'function') {
+                            window.switchToLeaflet();
+                        } else {
+                            console.warn('[GMAP] Leaflet fallback function not exposed globally.');
+                        }
+                    } catch(e){ console.error('[GMAP] Error invoking Leaflet fallback:', e); }
+                    console.info('[GMAP] Troubleshoot Google:');
+                    console.info(' 1) Network tab -> filter "maps" -> confirm 200 status');
+                    console.info(' 2) Console: check for gm_authFailure / RefererNotAllowedMapError');
+                    console.info(' 3) Disable blockers or try Incognito');
+                    console.info(' 4) Enable Maps JavaScript API & billing in Google Cloud');
+                }
+            }
+            document.addEventListener('DOMContentLoaded', ()=> setTimeout(tryManualInit, 400));
+        })();
     </script>
     
     <script>

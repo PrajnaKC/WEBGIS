@@ -230,7 +230,8 @@ const pollInterval = setInterval(() => {
 // Watchdog: if after 5s googleMap not created, notify user
 setTimeout(() => {
     if (!googleMap) {
-        console.warn('Google Maps not initialized within expected time.');
-        updateStatus({ mode: 'Pending...', message: 'Still waiting for Google Maps API…', fallback: false });
+        console.warn('Google Maps not initialized within expected time - switching to Leaflet fallback automatically.');
+        updateStatus({ mode: 'Leaflet (Auto Fallback)', message: 'Google failed; loading Leaflet…', fallback: true });
+        try { initLeafletFallback(); } catch(e){ console.error('Failed invoking Leaflet fallback:', e); }
     }
 }, 5000);
